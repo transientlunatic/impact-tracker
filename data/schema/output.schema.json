@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Research Output",
+  "type": "object",
+  "required": ["id", "type", "title", "created"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Slug matching the YAML filename (without extension)."
+    },
+    "type": {
+      "type": "string",
+      "enum": ["software", "publication", "dataset"]
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "description": { "type": "string" },
+    "authors": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "created": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the output first existed (first commit, submission date, deposit date)."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repo": { "type": "string", "format": "uri" },
+        "doi": { "type": "string" },
+        "ads": { "type": "string", "description": "ADS bibcode" },
+        "inspire": { "type": "string", "description": "INSPIRE-HEP literature record id" },
+        "homepage": { "type": "string", "format": "uri" },
+        "pypi": { "type": "string", "description": "PyPI package name" },
+        "zenodo": { "type": "string", "description": "Zenodo DOI, e.g. 10.5281/zenodo.1234567" }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "description": "Which automated fetchers to run for this output (see scripts/fetchers).",
+      "items": {
+        "type": "string",
+        "enum": [
+          "github_stats",
+          "github_releases",
+          "zenodo",
+          "ads_citations",
+          "inspire_citations",
+          "altmetric",
+          "pypi_downloads"
+        ]
+      }
+    },
+    "software": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "language": { "type": "string" },
+        "license": { "type": "string" }
+      }
+    },
+    "publication": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "journal": { "type": "string" },
+        "arxiv": { "type": "string" },
+        "year": { "type": "integer" }
+      }
+    },
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": { "type": "string" },
+        "size": { "type": "string" },
+        "repository": { "type": "string" }
+      }
+    }
+  }
+}

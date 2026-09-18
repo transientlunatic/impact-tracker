@@ -1,0 +1,43 @@
+name: Fetch impact metrics
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC.
+    - cron: "0 6 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Run fetchers
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADS_TOKEN: ${{ secrets.ADS_TOKEN }}
+          ALTMETRIC_KEY: ${{ secrets.ALTMETRIC_KEY }}
+        run: python scripts/fetch_metrics.py
+
+      - name: Commit updated metrics
+        run: |
+          git config user.name "impact-tracker-bot"
+          git config user.email "actions@github.com"
+          git add data/history data/events
+          if git diff --cached --quiet; then
+            echo "No metric changes to commit."
+          else
+            git commit -m "Update impact metrics"
+            git push origin main
+          fi

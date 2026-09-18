@@ -1,0 +1,79 @@
+# Impact Tracker
+
+Tracks impact metrics for a research group's outputs &mdash; software,
+publications, and datasets &mdash; and their evolution over time, and
+publishes an interactive D3 dashboard to GitHub Pages.
+
+## How it works
+
+```
+data/outputs/*.yaml    one file per research output (metadata + which
+                        automated fetchers apply to it)
+data/history/*.jsonl   dated metric snapshots, appended weekly
+                        {"date": "...", "metric": "...", "value": ...}
+data/events/*.jsonl    dated events (releases, versions) for the
+                        activity timeline
+data/schema/           JSON Schema the outputs are validated against
+
+scripts/fetchers/      one module per metric/event source (GitHub,
+                        Zenodo, NASA ADS, INSPIRE-HEP, Altmetric, PyPI)
+scripts/fetch_metrics.py   runs the fetchers for every output, appends
+                            history, merges events
+scripts/validate_outputs.py   schema-validates data/outputs/*.yaml
+
+src/                    Eleventy site (Nunjucks templates + D3) that
+                        reads data/ and builds the dashboard
+```
+
+A scheduled GitHub Action (`.github/workflows/fetch-metrics.yml`) runs the
+fetchers weekly and commits the new snapshots. A second workflow
+(`.github/workflows/deploy.yml`) then rebuilds and deploys the site to
+GitHub Pages. A third (`.github/workflows/validate.yml`) schema-validates
+any pull request that touches `data/outputs/`.
+
+**Adding a new output does not require touching any code** &mdash; see
+[CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Local development
+
+```bash
+npm install
+npm run build      # build the static site into _site/
+npm run serve      # build + serve with live reload
+
+pip install -r requirements.txt
+python scripts/validate_outputs.py       # schema-check data/outputs/*.yaml
+python scripts/fetch_metrics.py          # run all fetchers (needs network + tokens)
+python scripts/fetch_metrics.py --only example-software   # just one output
+```
+
+Fetchers that need credentials read them from the environment:
+
+| Variable | Used by |
+|---|---|
+| `GITHUB_TOKEN` | GitHub stats/releases (raises your rate limit; public repos work unauthenticated too) |
+| `ADS_TOKEN` | NASA ADS citation counts &mdash; get one at https://ui.adsabs.harvard.edu/user/settings/token |
+| `ALTMETRIC_KEY` | Altmetric &mdash; optional, works unauthenticated at lower rate limits |
+
+INSPIRE-HEP, Zenodo, and PyPI downloads need no credentials.
+
+Set these as repository secrets (`Settings -> Secrets and variables ->
+Actions`) so the scheduled workflow can use them.
+
+## Enabling GitHub Pages
+
+In the repository's `Settings -> Pages`, set **Source** to "GitHub
+Actions". The `deploy.yml` workflow handles the rest on every push to
+`main`.
+
+## Design notes
+
+- **History is append-only JSONL**, not a rewritten "current value" field,
+  so the dashboard can chart evolution and the git history of `data/`
+  doubles as an audit trail of every recorded snapshot.
+- **Events are separate from metrics** so a release/version timeline can be
+  built independently of numeric metrics (some outputs may have one but not
+  the other).
+- **The site build makes no network calls** &mdash; it only reads what's
+  already committed under `data/`. All external API calls happen in the
+  scheduled fetch job, keeping the deploy fast and reproducible.

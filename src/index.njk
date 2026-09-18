@@ -1,0 +1,67 @@
+---
+layout: base.njk
+title: Impact Tracker Dashboard
+description: Group-wide impact metrics for software, publications and datasets.
+---
+<h1>Group Impact Dashboard</h1>
+<p class="lede">Software, publications and datasets tracked over time. Add a new output via a pull request &mdash; see <a href="https://github.com/{{ site.github_repo }}/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+
+<div class="stat-grid">
+  <div class="stat-tile"><div class="value">{{ totals.totalOutputs }}</div><div class="label">Outputs tracked</div></div>
+  <div class="stat-tile"><div class="value">{{ totals.countsByType.software or 0 }}</div><div class="label">Software</div></div>
+  <div class="stat-tile"><div class="value">{{ totals.countsByType.publication or 0 }}</div><div class="label">Publications</div></div>
+  <div class="stat-tile"><div class="value">{{ totals.countsByType.dataset or 0 }}</div><div class="label">Datasets</div></div>
+  <div class="stat-tile"><div class="value">{{ totals.totalStars }}</div><div class="label">GitHub stars</div></div>
+  <div class="stat-tile"><div class="value">{{ totals.totalCitations }}</div><div class="label">Citations</div></div>
+</div>
+
+<h2>Group activity timeline</h2>
+<div id="group-timeline" class="chart-card"></div>
+
+<h2>Metric evolution (group totals)</h2>
+<div class="chart-card">
+  <h3>GitHub stars</h3>
+  <div id="chart-stars"></div>
+</div>
+<div class="chart-card">
+  <h3>Citations (ADS)</h3>
+  <div id="chart-citations"></div>
+</div>
+
+<h2>All outputs</h2>
+<ul class="output-list">
+{% for output in outputs %}
+  <li>
+    <a class="output-card" href="{{ ('/outputs/' + output.id + '/') | url }}">
+      <span class="kind">{{ output.type }}</span>
+      <div class="title">{{ output.title }}</div>
+      <div class="meta">{{ output.authors | join(", ") }} &middot; {{ output.created | dateFormat }}</div>
+    </a>
+  </li>
+{% endfor %}
+</ul>
+
+<script type="application/json" id="data-outputs">{{ outputs | dump | safe }}</script>
+<script type="application/json" id="data-events">{{ events | dump | safe }}</script>
+<script type="application/json" id="data-aggregate">{{ aggregate | dump | safe }}</script>
+<script>
+  const dashOutputs = JSON.parse(document.getElementById("data-outputs").textContent);
+  const dashEvents = JSON.parse(document.getElementById("data-events").textContent);
+  const dashAggregate = JSON.parse(document.getElementById("data-aggregate").textContent);
+
+  const lanes = dashOutputs
+    .map((o) => ({ id: o.id, label: o.title, events: dashEvents[o.id] || [] }))
+    .filter((l) => l.events.length);
+  ImpactCharts.drawTimeline("#group-timeline", lanes);
+
+  if (dashAggregate.github_stars) {
+    ImpactCharts.drawLineChart("#chart-stars", [
+      { id: "stars", label: "GitHub stars", points: dashAggregate.github_stars },
+    ]);
+  }
+  if (dashAggregate.citations_ads) {
+    ImpactCharts.drawLineChart("#chart-citations", [
+      { id: "citations", label: "Citations", points: dashAggregate.citations_ads },
+    ]);
+  }
+</script>

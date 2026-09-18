@@ -1,0 +1,78 @@
+---
+layout: base.njk
+pagination:
+  data: outputs
+  size: 1
+  alias: output
+permalink: "/outputs/{{ output.id }}/index.html"
+eleventyComputed:
+  title: "{{ output.title }}"
+  description: "{{ output.description }}"
+---
+<p><a href="{{ '/outputs/' | url }}">&larr; All outputs</a></p>
+<span class="kind">{{ output.type }}</span>
+<h1>{{ output.title }}</h1>
+<p class="lede">{{ output.description }}</p>
+<p class="meta">{{ output.authors | join(", ") }} &middot; created {{ output.created | dateFormat }}</p>
+
+<p>
+  {% if output.links.repo %}<a href="{{ output.links.repo }}">Repository</a>{% endif %}
+  {% if output.links.doi %} &middot; <a href="https://doi.org/{{ output.links.doi }}">DOI: {{ output.links.doi }}</a>{% endif %}
+  {% if output.links.homepage %} &middot; <a href="{{ output.links.homepage }}">Homepage</a>{% endif %}
+  {% if output.links.pypi %} &middot; <a href="https://pypi.org/project/{{ output.links.pypi }}/">PyPI</a>{% endif %}
+</p>
+
+{% set outputLatest = latest[output.id] %}
+{% if outputLatest %}
+<div class="metrics-row">
+  {% for metric, value in outputLatest %}
+  <span class="metric-chip">{{ metric }}: {{ value }}</span>
+  {% endfor %}
+</div>
+{% endif %}
+
+<h2>Metric history</h2>
+<div id="output-chart" class="chart-card"></div>
+
+{% set outputHistory = history[output.id] %}
+{% if outputHistory %}
+<details class="table-toggle">
+  <summary>View raw data</summary>
+  <table class="data-table">
+    <thead><tr><th>Date</th><th>Metric</th><th>Value</th></tr></thead>
+    <tbody>
+    {% for row in outputHistory %}
+      <tr><td>{{ row.date }}</td><td>{{ row.metric }}</td><td>{{ row.value }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</details>
+{% else %}
+<p class="lede">No metric history recorded yet &mdash; it will appear after the next scheduled fetch.</p>
+{% endif %}
+
+{% set outputEvents = events[output.id] %}
+{% if outputEvents %}
+<h2>Timeline</h2>
+<div id="output-timeline" class="chart-card"></div>
+{% endif %}
+
+<script type="application/json" id="data-history">{{ (outputHistory or []) | dump | safe }}</script>
+<script type="application/json" id="data-events">{{ (outputEvents or []) | dump | safe }}</script>
+<script>
+  const rows = JSON.parse(document.getElementById("data-history").textContent);
+  const byMetric = {};
+  rows.forEach((r) => {
+    byMetric[r.metric] = byMetric[r.metric] || [];
+    byMetric[r.metric].push({ date: r.date, value: r.value });
+  });
+  const series = Object.entries(byMetric).map(([metric, points]) => ({ id: metric, label: metric, points }));
+  if (series.length) ImpactCharts.drawLineChart("#output-chart", series);
+
+  const evs = JSON.parse(document.getElementById("data-events").textContent);
+  if (evs.length) {
+    ImpactCharts.drawTimeline("#output-timeline", [
+      { id: "{{ output.id }}", label: "{{ output.title }}", events: evs },
+    ]);
+  }
+</script>

@@ -1,0 +1,28 @@
+---
+layout: base.njk
+title: All outputs
+description: Every tracked research output.
+permalink: /outputs/index.html
+---
+<h1>All outputs</h1>
+<p class="lede">{{ outputs.length }} research output{{ "s" if outputs.length != 1 }} tracked.</p>
+
+<ul class="output-list">
+{% for output in outputs %}
+  <li>
+    <a class="output-card" href="{{ ('/outputs/' + output.id + '/') | url }}">
+      <span class="kind">{{ output.type }}</span>
+      <div class="title">{{ output.title }}</div>
+      <div class="meta">{{ output.authors | join(", ") }} &middot; {{ output.created | dateFormat }}</div>
+      {% set outputLatest = latest[output.id] %}
+      {% if outputLatest %}
+      <div class="metrics-row">
+        {% for metric, value in outputLatest %}
+        <span class="metric-chip">{{ metric }}: {{ value }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </a>
+  </li>
+{% endfor %}
+</ul>

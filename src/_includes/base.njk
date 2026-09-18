@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title or "Impact Tracker" }}</title>
+<meta name="description" content="{{ description or 'Impact metrics for research software, publications and datasets.' }}">
+<link rel="stylesheet" href="{{ '/assets/css/style.css' | url }}">
+<script src="{{ '/assets/js/d3.min.js' | url }}"></script>
+<script src="{{ '/assets/js/charts.js' | url }}"></script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="{{ '/' | url }}">Impact Tracker</a>
+  <nav>
+    <a href="{{ '/' | url }}">Dashboard</a>
+    <a href="{{ '/outputs/' | url }}">All outputs</a>
+  </nav>
+</header>
+<main>
+{{ content | safe }}
+</main>
+<footer class="site-footer">
+  <p>Built with Eleventy + D3. Data lives in <code>data/</code> and is contributed via pull request &mdash; see <a href="https://github.com/{{ site.github_repo }}/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+</footer>
+</body>
+</html>
