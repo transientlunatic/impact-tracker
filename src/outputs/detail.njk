@@ -32,10 +32,10 @@ eleventyComputed:
 {% endif %}
 
 <h2>Metric history</h2>
-<div id="output-chart" class="chart-card"></div>
-
 {% set outputHistory = history[output.id] %}
 {% if outputHistory %}
+<div id="output-chart" class="chart-card"></div>
+
 <details class="table-toggle">
   <summary>View raw data</summary>
   <table class="data-table">

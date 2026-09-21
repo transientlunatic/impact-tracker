@@ -3,11 +3,49 @@
 Add a new software project, publication, or dataset by opening a pull
 request that adds one YAML file. No code changes needed.
 
-## 1. Create the file
+## The fast way: let the tool fill it in
+
+Instead of writing the YAML by hand, give `scripts/add_output.py` an
+identifier and it does the lookup for you:
+
+```bash
+pip install -r requirements.txt
+
+python scripts/add_output.py publication --doi 10.1103/PhysRevLett.116.061102
+python scripts/add_output.py publication --inspire 1421100
+python scripts/add_output.py publication --ads 2016PhRvL.116f1102A
+
+python scripts/add_output.py software --repo https://github.com/bilby-dev/bilby
+
+python scripts/add_output.py dataset --zenodo 10.5281/zenodo.7654321
+```
+
+It pulls title/authors/date/journal/etc. from INSPIRE-HEP, NASA ADS,
+Zenodo, or GitHub as appropriate, derives the `id`/filename from the title
+(override with `--id`), auto-fills `sources` based on which links it has,
+and runs the same schema check CI does before writing anything. If a
+lookup fails or comes back incomplete, it still writes the file but exits
+with a non-zero status and prints exactly which fields need to be filled
+in by hand (search the file for `TODO`) — it's a starting point, not a
+guarantee, so read the result before opening a pull request. Won't
+overwrite an existing file unless you pass `--force`.
+
+For a publication with a very large author list (e.g. a LIGO/Virgo/KAGRA
+collaboration paper), it uses the collaboration name as the single author
+entry when INSPIRE reports one, rather than dumping hundreds of names into
+the YAML.
+
+## Writing the file by hand
 
 Create `data/outputs/<your-slug>.yaml`, where `<your-slug>` is a short,
 url-safe id (lowercase letters, digits, hyphens) that also becomes the
 file's `id` field and the site's `/outputs/<your-slug>/` URL.
+
+**The filename must end in `.yaml`.** A file with no extension, or the
+wrong one, is silently invisible to both the site build and the local
+validator (though `validate_outputs.py` will now flag a stray file in
+`data/outputs/` that doesn't match `*.yaml`, so a pull request will catch
+it even if you don't run it locally first).
 
 Pick the template closest to what you're adding:
 
@@ -83,14 +121,14 @@ field reference in `data/schema/output.schema.json`.
 **Important:** dates must be quoted strings (`"2023-01-15"`), not bare
 YAML dates, or the schema check will fail.
 
-## 2. Validate locally (optional but recommended)
+## Validate locally (optional but recommended)
 
 ```bash
 pip install -r requirements.txt
 python scripts/validate_outputs.py
 ```
 
-## 3. Open a pull request
+## Open a pull request
 
 A GitHub Action schema-validates your file automatically and will comment
 with specific errors if something's missing or malformed. Once merged, the
