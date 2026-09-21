@@ -13,7 +13,8 @@ import yaml
 from jsonschema import Draft7Validator
 
 SCHEMA_PATH = "data/schema/output.schema.json"
-OUTPUTS_GLOB = "data/outputs/*.yaml"
+OUTPUTS_DIR = "data/outputs"
+OUTPUTS_GLOB = f"{OUTPUTS_DIR}/*.yaml"
 
 
 def main():
@@ -23,6 +24,15 @@ def main():
 
     ok = True
     seen_ids = {}
+
+    # A file that doesn't end in .yaml is invisible to this glob (and to the
+    # site build's own glob) and would otherwise fail silently - nobody sees
+    # an error and the output just never appears anywhere. Catch that here.
+    all_files = {f for f in glob.glob(f"{OUTPUTS_DIR}/*") if os.path.isfile(f)}
+    yaml_files = set(glob.glob(OUTPUTS_GLOB))
+    for path in sorted(all_files - yaml_files):
+        print(f"::error file={path}::file name must end in .yaml or it will be silently ignored")
+        ok = False
 
     for path in sorted(glob.glob(OUTPUTS_GLOB)):
         with open(path, encoding="utf-8") as f:

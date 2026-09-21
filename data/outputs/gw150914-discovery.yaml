@@ -1,0 +1,24 @@
+id: gw150914-discovery
+type: publication
+title: "Observation of Gravitational Waves from a Binary Black Hole Merger"
+description: >
+  Discovery paper for GW150914, the first direct detection of gravitational
+  waves and the first observation of a binary black hole merger, by the two
+  LIGO detectors on 14 September 2015.
+authors:
+  - "LIGO Scientific Collaboration and Virgo Collaboration"
+created: "2016-02-11"
+tags: [gravitational-waves, binary-black-holes, general-relativity]
+links:
+  doi: 10.1103/PhysRevLett.116.061102
+  ads: 2016PhRvL.116f1102A
+  inspire: "1421100"
+  homepage: https://arxiv.org/abs/1602.03837
+sources:
+  - ads_citations
+  - inspire_citations
+  - altmetric
+publication:
+  journal: "Physical Review Letters"
+  arxiv: "1602.03837"
+  year: 2016
