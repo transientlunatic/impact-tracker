@@ -5,3 +5,5 @@
 {"date": "2026-09-21", "metric": "github_stars", "value": 8}
 {"date": "2026-09-21", "metric": "github_forks", "value": 2}
 {"date": "2026-09-21", "metric": "github_open_issues", "value": 26}
+{"date": "2026-09-21", "metric": "zenodo_downloads", "value": 5}
+{"date": "2026-09-21", "metric": "zenodo_views", "value": 3875}
