@@ -27,7 +27,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ADS_TOKEN: ${{ secrets.ADS_TOKEN }}
-          ALTMETRIC_KEY: ${{ secrets.ALTMETRIC_KEY }}
+          ALTMETRIC_EXPLORER_KEY: ${{ secrets.ALTMETRIC_EXPLORER_KEY }}
+          ALTMETRIC_EXPLORER_SECRET: ${{ secrets.ALTMETRIC_EXPLORER_SECRET }}
         run: python scripts/fetch_metrics.py
 
       - name: Commit updated metrics
