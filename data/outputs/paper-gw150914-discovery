@@ -1,0 +1,25 @@
+# EXAMPLE RECORD - replace or delete once you add your own outputs.
+id: gw150914-discovery
+type: publication
+title: "Example Publication: inferring things from data"
+description: >
+  A placeholder publication entry. Swap the ADS bibcode / INSPIRE recid /
+  DOI for a real paper, or delete this file.
+authors:
+  - "Doe, J."
+  - "Smith, A."
+created: "2023-06-15"
+tags: [gravitational-waves, bayesian-inference]
+links:
+  doi: 10.1103/PhysRevLett.116.061102 
+  ads: 2016PhRvL.116f1102A
+  inspire: "1234567"
+  homepage: https://arxiv.org/abs/1602.03837
+sources:
+  - ads_citations
+  - inspire_citations
+  - altmetric
+publication:
+  journal: "Example Journal of Astrophysics"
+  arxiv: "0000.00000"
+  year: 2023
