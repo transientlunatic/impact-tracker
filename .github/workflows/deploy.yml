@@ -25,9 +25,18 @@ jobs:
           node-version: "20"
           cache: "npm"
 
+      - id: pages
+        uses: actions/configure-pages@v5
+
       - run: npm ci
 
       - run: npm run build
+        env:
+          # Project pages are served at /<repo>/, not /, so every emitted
+          # href/src (all built via Eleventy's `url` filter) needs that
+          # prefix. configure-pages resolves this correctly whether this
+          # is a project page, a user/org root page, or a custom domain.
+          PATH_PREFIX: "${{ steps.pages.outputs.base_path }}/"
 
       - uses: actions/upload-pages-artifact@v3
         with:
