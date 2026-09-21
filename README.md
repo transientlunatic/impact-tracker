@@ -53,9 +53,30 @@ Fetchers that need credentials read them from the environment:
 |---|---|
 | `GITHUB_TOKEN` | GitHub stats/releases (raises your rate limit; public repos work unauthenticated too) |
 | `ADS_TOKEN` | NASA ADS citation counts &mdash; get one at https://ui.adsabs.harvard.edu/user/settings/token |
-| `ALTMETRIC_KEY` | Altmetric &mdash; optional, works unauthenticated at lower rate limits |
+| `ALTMETRIC_EXPLORER_KEY` / `ALTMETRIC_EXPLORER_SECRET` | Altmetric &mdash; **Explorer** API credentials from https://www.altmetric.com/explorer/settings (institutional subscription; both required) |
 
 INSPIRE-HEP, Zenodo, and PyPI downloads need no credentials.
+
+### About the Altmetric fetcher
+
+`scripts/fetchers/altmetric.py` uses the **Explorer API**, not the free
+single-DOI Details Page API, since Explorer is what an institutional
+subscription (key + secret) grants access to. Explorer is built around
+bulk queries: on each run, every output with `altmetric` in its `sources`
+has its DOI batched into one signed "identifier list" request, then one
+`research_outputs` query fetches all of their metrics together (paginating
+as needed) rather than one API call per output. Re-running with the same
+set of outputs reuses the same identifier list (the endpoint is a
+find-or-create keyed on exact DOI-list content); adding or removing a
+tracked output changes that content and creates a new list, so you may
+see old lists accumulate in your Explorer account's UI over time.
+
+The exact attribute names read off each `research_outputs` row
+(`score`, `cited_by_tweeters_count`, `doi`) are carried over from
+Altmetric's Details Page API schema as a best guess, since the Explorer
+response schema wasn't reachable while writing this. If metrics come back
+empty once you have real credentials, add a quick `print(row)` in
+`_load_cache` in that file to see the actual field names and adjust.
 
 Set these as repository secrets (`Settings -> Secrets and variables ->
 Actions`) so the scheduled workflow can use them.
