@@ -1,0 +1,21 @@
+# EXAMPLE RECORD - replace or delete once you add your own outputs.
+id: example-dataset
+type: software
+title: "Asimov"
+description: >
+  Software for coordinating computational scientific analyses.
+authors:
+  - "Williams, D"
+created: "2024-01-10"
+tags: [sofware, python, htcondor]
+links:
+  repo: https://github.com/etive-io/asimov
+  pypi: asimov
+sources:
+  - github_stats
+  - github_releases
+  - zenodo
+  - pypi_downloads
+software:
+  language: Python
+  license: MIT
