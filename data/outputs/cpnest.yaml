@@ -3,10 +3,10 @@ type: software
 title: cpnest
 description: Parallel nested sampling
 authors:
-- johnveitch
+- John Veitch
 - wdpozzo
 - alexlyttle
-- mj-will
+- Michael Williams
 - ColmTalbot
 created: '2016-11-21'
 tags:
