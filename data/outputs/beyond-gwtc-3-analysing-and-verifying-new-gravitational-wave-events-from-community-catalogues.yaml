@@ -1,0 +1,23 @@
+id: beyond-gwtc-3-analysing-and-verifying-new-gravitational-wave-events-from-community-catalogues
+type: dataset
+title: 'Beyond GWTC-3: Analysing and verifying new gravitational-wave events from community catalogues'
+description: 'These data contain the parameter estimation results described in "Beyond GWTC-3: Analysing
+  and verifying new gravitational-wave events from community catalogues" in a format which is designed
+  to be comparable to those used in GWTC catalogue parameter estimation data releases.
+
+  The results are presented in the same PESummary metafile format as the GWTC-3 data release, however
+  we do not provide mixed samples, as our analysis only contains results produced with the IMRPhenomXPHM
+  waveform approximant'
+authors:
+- Williams, Daniel
+created: '2025-01-07'
+tags: []
+links:
+  doi: 10.5281/zenodo.14537407
+sources:
+- zenodo
+- altmetric
+dataset:
+  format: H5
+  size: 2.1 GB
+  repository: Zenodo
