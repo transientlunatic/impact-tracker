@@ -1,0 +1,23 @@
+id: glasflow
+type: software
+title: glasflow
+description: Normalising flows implemented using nflows
+authors:
+- mj-will
+- jmcginn
+- federicostak
+- johnveitch
+created: '2021-06-04'
+tags:
+- normalizing-flows
+- pytorch
+- torch
+links:
+  repo: https://github.com/uofgravity/glasflow
+  pypi: glasflow
+sources:
+- github_stats
+- github_releases
+- pypi_downloads
+software:
+  language: Python
