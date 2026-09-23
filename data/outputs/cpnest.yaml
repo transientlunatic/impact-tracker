@@ -1,0 +1,25 @@
+id: cpnest
+type: software
+title: cpnest
+description: Parallel nested sampling
+authors:
+- johnveitch
+- wdpozzo
+- alexlyttle
+- mj-will
+- ColmTalbot
+created: '2016-11-21'
+tags:
+- bayesian-inference
+- nested-sampling
+- python
+links:
+  repo: https://github.com/johnveitch/cpnest
+  pypi: cpnest
+sources:
+- github_stats
+- github_releases
+- pypi_downloads
+software:
+  language: Python
+  license: MIT
