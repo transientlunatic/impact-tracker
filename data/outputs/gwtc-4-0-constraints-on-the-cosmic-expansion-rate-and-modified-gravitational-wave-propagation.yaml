@@ -1,0 +1,20 @@
+id: gwtc-4-0-constraints-on-the-cosmic-expansion-rate-and-modified-gravitational-wave-propagation
+type: publication
+title: 'GWTC-4.0: Constraints on the Cosmic Expansion Rate and Modified Gravitational-wave Propagation'
+authors:
+- LIGO Scientific and Virgo and KAGRA
+created: 2025-09-04
+tags:
+- astro-ph.CO
+- gr-qc
+links:
+  doi: 10.3847/2041-8213/ae69dd
+  inspire: '2966674'
+  homepage: https://arxiv.org/abs/2509.04348
+sources:
+- inspire_citations
+- altmetric
+publication:
+  journal: Astrophys.J.Lett.
+  arxiv: '2509.04348'
+  year: 2026
