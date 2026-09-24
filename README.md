@@ -30,9 +30,11 @@ src/                    Eleventy site (Nunjucks templates + D3) that
 ```
 
 An output's `group_authors` field names which `data/people/` entries are
-authors on it &mdash; the mechanism for highlighting group members on
-large-collaboration papers (e.g. LVK) whose `authors` field is just the
-collaboration name. See [CONTRIBUTING.md](CONTRIBUTING.md).
+authors on it, and what each contributed (CRediT roles + free-text detail)
+&mdash; the mechanism for highlighting group members on large-collaboration
+papers (e.g. LVK) whose `authors` field is just the collaboration name, and
+for recording contributions on any output more generally. See
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 A scheduled GitHub Action (`.github/workflows/fetch-metrics.yml`) runs the
 fetchers weekly and commits the new snapshots. A second workflow

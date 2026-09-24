@@ -23,10 +23,45 @@
     },
     "group_authors": {
       "type": "array",
-      "description": "IDs (data/people/<id>.yaml) of group members who are authors on this output. Use this to name individual group members on a large-collaboration paper (e.g. LVK) whose 'authors' field is just the collaboration name.",
+      "description": "Group members (data/people/<id>.yaml) who are authors on this output, and what they contributed. Use this to name individual group members on a large-collaboration paper (e.g. LVK) whose 'authors' field is just the collaboration name, and/or to record CRediT roles for any output.",
       "items": {
-        "type": "string",
-        "pattern": "^[a-z0-9][a-z0-9-]*$"
+        "type": "object",
+        "required": ["id"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$",
+            "description": "data/people/<id>.yaml id."
+          },
+          "roles": {
+            "type": "array",
+            "description": "CRediT (Contributor Roles Taxonomy, https://credit.niso.org/) roles for this person on this output.",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Conceptualization",
+                "Data curation",
+                "Formal analysis",
+                "Funding acquisition",
+                "Investigation",
+                "Methodology",
+                "Project administration",
+                "Resources",
+                "Software",
+                "Supervision",
+                "Validation",
+                "Visualization",
+                "Writing - original draft",
+                "Writing - review & editing"
+              ]
+            }
+          },
+          "detail": {
+            "type": "string",
+            "description": "Free-text detail on their contribution, beyond the CRediT roles (e.g. which part of the analysis, which module)."
+          }
+        }
       }
     },
     "created": {

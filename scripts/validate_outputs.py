@@ -64,8 +64,9 @@ def main():
             print(f"::error file={path}::{location}: {error.message}")
             ok = False
 
-        for person_id in doc.get("group_authors") or []:
-            if person_id not in people_ids:
+        for entry in doc.get("group_authors") or []:
+            person_id = entry.get("id") if isinstance(entry, dict) else None
+            if person_id and person_id not in people_ids:
                 print(
                     f"::error file={path}::group_authors references "
                     f"{person_id!r}, which has no data/people/{person_id}.yaml"
