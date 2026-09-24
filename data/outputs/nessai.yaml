@@ -1,0 +1,26 @@
+id: nessai
+type: software
+title: nessai
+description: 'nessai: Nested Sampling with Artificial Intelligence'
+authors:
+- mj-will
+- johnveitch
+- cchapmanbird
+created: '2020-10-23'
+tags:
+- bayesian-inference
+- bilby
+- machine-learning
+- nested-sampling
+- normalizing-flows
+- python
+- pytorch
+links:
+  repo: https://github.com/mj-will/nessai
+  homepage: https://nessai.readthedocs.io/
+sources:
+- github_stats
+- github_releases
+software:
+  language: Python
+  license: MIT
