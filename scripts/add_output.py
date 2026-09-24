@@ -5,6 +5,7 @@ Examples:
   python scripts/add_output.py publication --doi 10.1103/PhysRevLett.116.061102
   python scripts/add_output.py publication --inspire 1421100
   python scripts/add_output.py publication --ads 2016PhRvL.116f1102A
+  python scripts/add_output.py publication --inspire 1421100 --group-authors jane-smith,john-doe
   python scripts/add_output.py software --repo https://github.com/bilby-dev/bilby
   python scripts/add_output.py dataset --zenodo 10.5281/zenodo.7654321
 
@@ -15,6 +16,7 @@ not overwrite an existing file unless --force is given, and it runs the
 same schema check as CI before writing, printing anything still missing.
 """
 import argparse
+import glob
 import json
 import os
 import re
@@ -28,9 +30,10 @@ OUTPUTS_DIR = "data/outputs"
 SCHEMA_PATH = "data/schema/output.schema.json"
 
 FIELD_ORDER = [
-    "id", "type", "title", "description", "authors", "created", "tags",
-    "links", "sources", "software", "publication", "dataset",
+    "id", "type", "title", "description", "authors", "group_authors", "created",
+    "tags", "links", "sources", "software", "publication", "dataset",
 ]
+PEOPLE_DIR = "data/people"
 
 
 def slugify(text):
@@ -48,6 +51,30 @@ def validate_record(record):
         schema = json.load(f)
     validator = Draft7Validator(schema)
     return sorted(validator.iter_errors(record), key=lambda e: list(e.path))
+
+
+def known_person_ids():
+    ids = set()
+    for path in glob.glob(os.path.join(PEOPLE_DIR, "*.yaml")):
+        with open(path, encoding="utf-8") as f:
+            doc = yaml.safe_load(f) or {}
+        if doc.get("id"):
+            ids.add(doc["id"])
+    return ids
+
+
+def parse_group_authors(raw):
+    """--group-authors is a comma-separated list of data/people/<id>.yaml
+    ids. Warn (but don't fail) on an id with no matching person file, since
+    the person record might be added in the same pull request."""
+    if not raw:
+        return []
+    ids = [p.strip() for p in raw.split(",") if p.strip()]
+    known = known_person_ids()
+    for person_id in ids:
+        if person_id not in known:
+            print(f"warning: group author {person_id!r} has no data/people/{person_id}.yaml (yet)", file=sys.stderr)
+    return ids
 
 
 def find_todos(value, path=""):
@@ -260,6 +287,7 @@ def cmd_publication(args):
         "type": "publication",
         "title": title,
         "authors": fields.get("authors") or ["TODO: authors"],
+        "group_authors": parse_group_authors(args.group_authors) or None,
         "created": fields.get("created") or "TODO: YYYY-MM-DD",
         "tags": fields.get("tags", []),
         "links": links,
@@ -435,6 +463,11 @@ def main():
     pub.add_argument("--arxiv")
     pub.add_argument("--inspire")
     pub.add_argument("--ads")
+    pub.add_argument(
+        "--group-authors",
+        help="comma-separated data/people/<id>.yaml ids of group members who are authors "
+        "(useful when --inspire collapses authors to a collaboration name)",
+    )
 
     software = subparsers.add_parser("software", parents=[common], help="enrich from a GitHub repo URL")
     software.add_argument("--repo", required=True)

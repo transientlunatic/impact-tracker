@@ -141,3 +141,67 @@ Delete `data/outputs/<slug>.yaml`. Its history (`data/history/<slug>.jsonl`)
 and events (`data/events/<slug>.jsonl`) are left in place unless you delete
 them too &mdash; the site simply stops listing an output once its YAML file
 is gone.
+
+# Contributing a group member
+
+We're members of large collaborations (LVK etc.) whose papers list the
+collaboration as a single author, not individual names. `data/people/`
+keeps a roster of current and former group members &mdash; with ORCIDs
+&mdash; so we can still say who in the group actually authored a given
+collaboration paper, via each output's `group_authors` field.
+
+Create `data/people/<slug>.yaml`, where `<slug>` is a short, url-safe id
+(lowercase letters, digits, hyphens) that also becomes the file's `id`
+field and is what `group_authors` entries in `data/outputs/*.yaml`
+reference.
+
+```yaml
+id: your-slug
+name: "Jane Smith"
+orcid: "0000-0002-1825-0097"   # optional
+role: "PhD student"             # optional, free text
+status: current                 # current | former
+joined: "2021-09-01"            # always quoted
+# left: "2025-06-30"            # required (and only set) when status: former
+links:
+  website: https://example.org/~jsmith   # optional
+  github: https://github.com/jsmith      # optional
+  inspire: J.Smith.1                     # optional, INSPIRE-HEP author id/BAI
+```
+
+`status: former` requires a `left` date; `status: current` must not have
+one. See the full field reference in `data/schema/person.schema.json`.
+
+## Naming group members as authors on an output
+
+Add their person id(s) to the output's `group_authors` list:
+
+```yaml
+authors:
+  - "LIGO Scientific Collaboration and Virgo Collaboration and KAGRA Collaboration"
+group_authors: [your-slug, another-slug]
+```
+
+`scripts/add_output.py publication` accepts this directly, so you can tag
+group authors at the same time you scaffold a collaboration paper:
+
+```bash
+python scripts/add_output.py publication --inspire 1421100 --group-authors your-slug,another-slug
+```
+
+Every id in `group_authors` must match an existing `data/people/<id>.yaml`
+&mdash; `scripts/validate_outputs.py` checks this and CI will reject a typo
+or a person who isn't in the roster yet.
+
+## Validate locally (optional but recommended)
+
+```bash
+pip install -r requirements.txt
+python scripts/validate_people.py
+```
+
+## Open a pull request
+
+A GitHub Action schema-validates your file automatically. Once merged, the
+person appears on the site's `/people/` page immediately (no fetcher
+involved &mdash; people have no external metrics).

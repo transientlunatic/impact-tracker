@@ -1,0 +1,48 @@
+---
+layout: base.njk
+pagination:
+  data: people
+  size: 1
+  alias: person
+permalink: "/people/{{ person.id }}/index.html"
+eleventyComputed:
+  title: "{{ person.name }}"
+  description: "{{ person.role or 'Group member' }}"
+---
+<p><a href="{{ '/people/' | url }}">&larr; All people</a></p>
+<span class="kind">{{ person.status }}</span>
+<h1>{{ person.name }}</h1>
+<p class="lede">{{ person.role or "Group member" }}</p>
+<p class="meta">
+  {% if person.status == "current" %}
+    joined {{ person.joined | dateFormat }}
+  {% else %}
+    {{ person.joined | dateFormat }} &ndash; {{ person.left | dateFormat }}
+  {% endif %}
+</p>
+
+<p>
+  {% if person.orcid %}<a href="https://orcid.org/{{ person.orcid }}">ORCID: {{ person.orcid }}</a>{% endif %}
+  {% if person.links.website %} &middot; <a href="{{ person.links.website }}">Website</a>{% endif %}
+  {% if person.links.github %} &middot; <a href="{{ person.links.github }}">GitHub</a>{% endif %}
+  {% if person.links.inspire %} &middot; <a href="https://inspirehep.net/authors/{{ person.links.inspire }}">INSPIRE-HEP</a>{% endif %}
+</p>
+
+<h2>Papers</h2>
+{% set papers = authorship[person.id] %}
+{% if papers %}
+<p class="lede">Outputs where {{ person.name }} is named as a group author &mdash; useful for large-collaboration papers whose author list is just the collaboration name.</p>
+<ul class="output-list">
+{% for paper in papers %}
+  <li>
+    <a class="output-card" href="{{ ('/outputs/' + paper.id + '/') | url }}">
+      <span class="kind">{{ paper.type }}</span>
+      <div class="title">{{ paper.title }}</div>
+      <div class="meta">{{ paper.created | dateFormat }}</div>
+    </a>
+  </li>
+{% endfor %}
+</ul>
+{% else %}
+<p class="lede">No outputs list {{ person.name }} as a group author yet.</p>
+{% endif %}

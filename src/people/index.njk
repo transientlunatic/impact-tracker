@@ -1,0 +1,49 @@
+---
+layout: base.njk
+title: People
+description: Current and former members of the group, and the collaboration papers they've authored.
+permalink: /people/index.html
+---
+<h1>People</h1>
+<p class="lede">Group members, past and present. See <a href="{{ '/' | url }}outputs/">outputs</a> for papers where the collaboration author list hides individual names &mdash; group members on those are named below.</p>
+
+{% set current = people | selectattr("status", "equalto", "current") | list %}
+{% set former = people | selectattr("status", "equalto", "former") | list %}
+
+<h2>Current members</h2>
+<ul class="output-list">
+{% for person in current %}
+  <li>
+    <a class="output-card" href="{{ ('/people/' + person.id + '/') | url }}">
+      <div class="title">{{ person.name }}</div>
+      <div class="meta">
+        {{ person.role or "Group member" }}
+        {% if person.orcid %} &middot; ORCID: {{ person.orcid }}{% endif %}
+        &middot; joined {{ person.joined | dateFormat }}
+      </div>
+      {% set papers = authorship[person.id] %}
+      {% if papers %}<div class="meta">{{ papers.length }} collaboration paper{{ "s" if papers.length != 1 }} listed</div>{% endif %}
+    </a>
+  </li>
+{% endfor %}
+</ul>
+
+{% if former.length %}
+<h2>Former members</h2>
+<ul class="output-list">
+{% for person in former %}
+  <li>
+    <a class="output-card" href="{{ ('/people/' + person.id + '/') | url }}">
+      <div class="title">{{ person.name }}</div>
+      <div class="meta">
+        {{ person.role or "Group member" }}
+        {% if person.orcid %} &middot; ORCID: {{ person.orcid }}{% endif %}
+        &middot; {{ person.joined | dateFormat }}&ndash;{{ person.left | dateFormat }}
+      </div>
+      {% set papers = authorship[person.id] %}
+      {% if papers %}<div class="meta">{{ papers.length }} collaboration paper{{ "s" if papers.length != 1 }} listed</div>{% endif %}
+    </a>
+  </li>
+{% endfor %}
+</ul>
+{% endif %}

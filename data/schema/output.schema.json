@@ -21,6 +21,14 @@
       "items": { "type": "string" },
       "minItems": 1
     },
+    "group_authors": {
+      "type": "array",
+      "description": "IDs (data/people/<id>.yaml) of group members who are authors on this output. Use this to name individual group members on a large-collaboration paper (e.g. LVK) whose 'authors' field is just the collaboration name.",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9][a-z0-9-]*$"
+      }
+    },
     "created": {
       "type": "string",
       "format": "date",
