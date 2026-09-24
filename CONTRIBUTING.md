@@ -172,24 +172,37 @@ links:
 `status: former` requires a `left` date; `status: current` must not have
 one. See the full field reference in `data/schema/person.schema.json`.
 
-## Naming group members as authors on an output
+## Naming group members as authors on an output, and their contribution
 
-Add their person id(s) to the output's `group_authors` list:
+Add an entry per person to the output's `group_authors` list. Each entry
+is at least an `id`; `roles` (from the [CRediT taxonomy](https://credit.niso.org/))
+and a free-text `detail` are optional, and work on any output type, not
+just collaboration papers:
 
 ```yaml
 authors:
   - "LIGO Scientific Collaboration and Virgo Collaboration and KAGRA Collaboration"
-group_authors: [your-slug, another-slug]
+group_authors:
+  - id: your-slug
+    roles: [Software, "Formal analysis"]
+    detail: "Ran the parameter estimation pipeline and wrote the population inference code."
+  - id: another-slug
+    roles: [Supervision]
 ```
 
-`scripts/add_output.py publication` accepts this directly, so you can tag
-group authors at the same time you scaffold a collaboration paper:
+The full set of CRediT roles (spelled exactly as below):
+`Conceptualization`, `Data curation`, `Formal analysis`,
+`Funding acquisition`, `Investigation`, `Methodology`,
+`Project administration`, `Resources`, `Software`, `Supervision`,
+`Validation`, `Visualization`, `Writing - original draft`,
+`Writing - review & editing`.
 
-```bash
-python scripts/add_output.py publication --inspire 1421100 --group-authors your-slug,another-slug
-```
+`scripts/add_output.py publication --group-authors id1,id2` tags group
+authors at the same time you scaffold a collaboration paper, but only
+writes bare `{id: ...}` entries &mdash; add `roles`/`detail` by hand
+afterwards, since contribution isn't something a lookup can guess.
 
-Every id in `group_authors` must match an existing `data/people/<id>.yaml`
+Every `id` in `group_authors` must match an existing `data/people/<id>.yaml`
 &mdash; `scripts/validate_outputs.py` checks this and CI will reject a typo
 or a person who isn't in the roster yet.
 

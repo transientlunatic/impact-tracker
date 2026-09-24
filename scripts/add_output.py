@@ -66,7 +66,9 @@ def known_person_ids():
 def parse_group_authors(raw):
     """--group-authors is a comma-separated list of data/people/<id>.yaml
     ids. Warn (but don't fail) on an id with no matching person file, since
-    the person record might be added in the same pull request."""
+    the person record might be added in the same pull request. Written out
+    as {id: ...} entries with no `roles`/`detail` - CRediT roles are for a
+    human to fill in by hand, not to guess."""
     if not raw:
         return []
     ids = [p.strip() for p in raw.split(",") if p.strip()]
@@ -74,7 +76,7 @@ def parse_group_authors(raw):
     for person_id in ids:
         if person_id not in known:
             print(f"warning: group author {person_id!r} has no data/people/{person_id}.yaml (yet)", file=sys.stderr)
-    return ids
+    return [{"id": person_id} for person_id in ids]
 
 
 def find_todos(value, path=""):
