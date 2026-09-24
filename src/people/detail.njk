@@ -28,10 +28,10 @@ eleventyComputed:
   {% if person.links.inspire %} &middot; <a href="https://inspirehep.net/authors/{{ person.links.inspire }}">INSPIRE-HEP</a>{% endif %}
 </p>
 
-<h2>Papers</h2>
+<h2>Outputs &amp; contributions</h2>
 {% set papers = authorship[person.id] %}
 {% if papers %}
-<p class="lede">Outputs where {{ person.name }} is named as a group author &mdash; useful for large-collaboration papers whose author list is just the collaboration name.</p>
+<p class="lede">Outputs where {{ person.name }} is named as a group author, with their CRediT contribution roles where recorded.</p>
 <ul class="output-list">
 {% for paper in papers %}
   <li>
@@ -39,6 +39,12 @@ eleventyComputed:
       <span class="kind">{{ paper.type }}</span>
       <div class="title">{{ paper.title }}</div>
       <div class="meta">{{ paper.created | dateFormat }}</div>
+      {% if paper.roles.length %}
+      <div class="metrics-row">
+        {% for role in paper.roles %}<span class="metric-chip">{{ role }}</span>{% endfor %}
+      </div>
+      {% endif %}
+      {% if paper.detail %}<div class="meta">{{ paper.detail }}</div>{% endif %}
     </a>
   </li>
 {% endfor %}

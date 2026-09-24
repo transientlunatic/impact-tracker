@@ -16,13 +16,21 @@ eleventyComputed:
 <p class="meta">{{ output.authors | join(", ") }} &middot; created {{ output.created | dateFormat }}</p>
 
 {% if output.group_authors %}
-<p class="meta">
-  Group authors:
-  {% for personId in output.group_authors %}
-    {% set person = people | selectattr("id", "equalto", personId) | first %}
-    <a href="{{ ('/people/' + personId + '/') | url }}">{{ person.name if person else personId }}</a>{{ ", " if not loop.last }}
-  {% endfor %}
-</p>
+<h2>Group authors &amp; contributions</h2>
+<ul class="output-list">
+{% for entry in output.group_authors %}
+  {% set person = people | selectattr("id", "equalto", entry.id) | first %}
+  <li class="output-card">
+    <div class="title"><a href="{{ ('/people/' + entry.id + '/') | url }}">{{ person.name if person else entry.id }}</a></div>
+    {% if entry.roles %}
+    <div class="metrics-row">
+      {% for role in entry.roles %}<span class="metric-chip">{{ role }}</span>{% endfor %}
+    </div>
+    {% endif %}
+    {% if entry.detail %}<div class="meta">{{ entry.detail }}</div>{% endif %}
+  </li>
+{% endfor %}
+</ul>
 {% endif %}
 
 <p>
