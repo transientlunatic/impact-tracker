@@ -6,6 +6,7 @@ Examples:
   python scripts/add_output.py publication --inspire 1421100
   python scripts/add_output.py publication --ads 2016PhRvL.116f1102A
   python scripts/add_output.py publication --inspire 1421100 --group-authors jane-smith,john-doe
+  python scripts/add_output.py publication --inspire 1421100 --detect-group-authors
   python scripts/add_output.py software --repo https://github.com/bilby-dev/bilby
   python scripts/add_output.py dataset --zenodo 10.5281/zenodo.7654321
 
@@ -26,6 +27,8 @@ import requests
 import yaml
 from jsonschema import Draft7Validator
 
+import people_match
+
 OUTPUTS_DIR = "data/outputs"
 SCHEMA_PATH = "data/schema/output.schema.json"
 
@@ -33,7 +36,6 @@ FIELD_ORDER = [
     "id", "type", "title", "description", "authors", "group_authors", "created",
     "tags", "links", "sources", "software", "publication", "dataset",
 ]
-PEOPLE_DIR = "data/people"
 
 
 def slugify(text):
@@ -54,13 +56,7 @@ def validate_record(record):
 
 
 def known_person_ids():
-    ids = set()
-    for path in glob.glob(os.path.join(PEOPLE_DIR, "*.yaml")):
-        with open(path, encoding="utf-8") as f:
-            doc = yaml.safe_load(f) or {}
-        if doc.get("id"):
-            ids.add(doc["id"])
-    return ids
+    return {p["id"] for p in people_match.load_people()}
 
 
 def parse_group_authors(raw):
@@ -219,7 +215,7 @@ def fetch_ads(bibcode):
     try:
         r = requests.get(
             "https://api.adsabs.harvard.edu/v1/search/query",
-            params={"q": f"bibcode:{bibcode}", "fl": "title,author,doi,pubdate,year"},
+            params={"q": f"bibcode:{bibcode}", "fl": "title,author,doi,pubdate,year,orcid_pub"},
             headers={"Authorization": f"Bearer {token}"},
             timeout=30,
         )
@@ -254,6 +250,7 @@ def cmd_publication(args):
         inspire_meta = fetch_inspire(recid=args.inspire, doi=args.doi, arxiv=args.arxiv)
     fields = parse_inspire(inspire_meta) if inspire_meta else {}
 
+    ads_doc = None
     if args.ads:
         fields.setdefault("ads", args.ads)
         ads_doc = fetch_ads(args.ads)
@@ -303,6 +300,19 @@ def cmd_publication(args):
         } or None,
     }
     record = {k: v for k, v in record.items() if v is not None}
+
+    if args.detect_group_authors:
+        identities = []
+        if inspire_meta:
+            identities += people_match.inspire_identities(inspire_meta)
+        if ads_doc:
+            identities += people_match.ads_identities(ads_doc)
+        if identities:
+            already = {e["id"] for e in record.get("group_authors") or []}
+            people_match.print_matches(people_match.match_people(identities, people_match.load_people(), already))
+        else:
+            print("No per-author identifiers to match against (no INSPIRE/ADS record found).")
+
     write_output(output_id, record, args.force)
 
 
@@ -469,6 +479,12 @@ def main():
         "--group-authors",
         help="comma-separated data/people/<id>.yaml ids of group members who are authors "
         "(useful when --inspire collapses authors to a collaboration name)",
+    )
+    pub.add_argument(
+        "--detect-group-authors",
+        action="store_true",
+        help="print possible group_authors matches against data/people/*.yaml, by ORCID/INSPIRE "
+        "BAI (high confidence) or name (unconfirmed) - suggestions only, never written automatically",
     )
 
     software = subparsers.add_parser("software", parents=[common], help="enrich from a GitHub repo URL")

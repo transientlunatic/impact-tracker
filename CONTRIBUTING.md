@@ -206,6 +206,36 @@ Every `id` in `group_authors` must match an existing `data/people/<id>.yaml`
 &mdash; `scripts/validate_outputs.py` checks this and CI will reject a typo
 or a person who isn't in the roster yet.
 
+## Auto-detecting group authors
+
+Typing out ids by hand doesn't scale, and INSPIRE-HEP/NASA ADS records
+keep the *full* author list (with per-author ORCID/INSPIRE BAI) even for
+a collaboration paper whose `authors` field we collapse to the
+collaboration name &mdash; so that full list can be matched against
+`data/people/*.yaml` automatically. An ORCID or INSPIRE BAI match is
+high-confidence (those ids are specific to one person); a match on name
+alone is not (surnames collide) and is always printed as `(unconfirmed)`
+for you to check before adding it. Neither tool below writes to
+`data/outputs/*.yaml` for you.
+
+While scaffolding a new publication:
+
+```bash
+python scripts/add_output.py publication --inspire 1421100 --detect-group-authors
+```
+
+Against outputs already in the repo (checks every output with a
+`links.inspire`/`links.ads`, or just one with `--only <id>`):
+
+```bash
+python scripts/detect_group_authors.py
+python scripts/detect_group_authors.py --only gw150914-discovery
+```
+
+Both print candidate `id`/confidence/matched-name lines to copy into
+`group_authors` &mdash; add `roles`/`detail` by hand once you've confirmed
+the match.
+
 ## Validate locally (optional but recommended)
 
 ```bash
