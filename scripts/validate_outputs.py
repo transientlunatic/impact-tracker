@@ -15,12 +15,27 @@ from jsonschema import Draft7Validator
 SCHEMA_PATH = "data/schema/output.schema.json"
 OUTPUTS_DIR = "data/outputs"
 OUTPUTS_GLOB = f"{OUTPUTS_DIR}/*.yaml"
+PEOPLE_GLOB = "data/people/*.yaml"
+
+
+def known_person_ids():
+    """IDs of every data/people/*.yaml, so group_authors can be checked for
+    typos/removed people. Empty (not an error) if data/people/ has no files
+    yet - person records are optional."""
+    ids = set()
+    for path in glob.glob(PEOPLE_GLOB):
+        with open(path, encoding="utf-8") as f:
+            doc = yaml.safe_load(f) or {}
+        if doc.get("id"):
+            ids.add(doc["id"])
+    return ids
 
 
 def main():
     with open(SCHEMA_PATH, encoding="utf-8") as f:
         schema = json.load(f)
     validator = Draft7Validator(schema)
+    people_ids = known_person_ids()
 
     ok = True
     seen_ids = {}
@@ -48,6 +63,14 @@ def main():
             location = ".".join(str(p) for p in error.path) or "(root)"
             print(f"::error file={path}::{location}: {error.message}")
             ok = False
+
+        for person_id in doc.get("group_authors") or []:
+            if person_id not in people_ids:
+                print(
+                    f"::error file={path}::group_authors references "
+                    f"{person_id!r}, which has no data/people/{person_id}.yaml"
+                )
+                ok = False
 
         output_id = doc.get("id")
         base_name = os.path.splitext(os.path.basename(path))[0]

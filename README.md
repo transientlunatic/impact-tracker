@@ -9,21 +9,30 @@ publishes an interactive D3 dashboard to GitHub Pages.
 ```
 data/outputs/*.yaml    one file per research output (metadata + which
                         automated fetchers apply to it)
+data/people/*.yaml     one file per group member, current or former
+                        (name, ORCID, role, dates)
 data/history/*.jsonl   dated metric snapshots, appended weekly
                         {"date": "...", "metric": "...", "value": ...}
 data/events/*.jsonl    dated events (releases, versions) for the
                         activity timeline
-data/schema/           JSON Schema the outputs are validated against
+data/schema/           JSON Schema the outputs and people are validated
+                        against
 
 scripts/fetchers/      one module per metric/event source (GitHub,
                         Zenodo, NASA ADS, INSPIRE-HEP, Altmetric, PyPI)
 scripts/fetch_metrics.py   runs the fetchers for every output, appends
                             history, merges events
 scripts/validate_outputs.py   schema-validates data/outputs/*.yaml
+scripts/validate_people.py    schema-validates data/people/*.yaml
 
 src/                    Eleventy site (Nunjucks templates + D3) that
                         reads data/ and builds the dashboard
 ```
+
+An output's `group_authors` field names which `data/people/` entries are
+authors on it &mdash; the mechanism for highlighting group members on
+large-collaboration papers (e.g. LVK) whose `authors` field is just the
+collaboration name. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 A scheduled GitHub Action (`.github/workflows/fetch-metrics.yml`) runs the
 fetchers weekly and commits the new snapshots. A second workflow
@@ -43,6 +52,7 @@ npm run serve      # build + serve with live reload
 
 pip install -r requirements.txt
 python scripts/validate_outputs.py       # schema-check data/outputs/*.yaml
+python scripts/validate_people.py        # schema-check data/people/*.yaml
 python scripts/fetch_metrics.py          # run all fetchers (needs network + tokens)
 python scripts/fetch_metrics.py --only example-software   # just one output
 ```

@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Group Member",
+  "type": "object",
+  "required": ["id", "name", "status", "joined"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$",
+      "description": "Slug matching the YAML filename (without extension). Referenced by outputs.group_authors."
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "orcid": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$",
+      "description": "ORCID iD, e.g. 0000-0002-1825-0097."
+    },
+    "role": {
+      "type": "string",
+      "description": "e.g. PhD student, Postdoc, PI, Research fellow."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["current", "former"]
+    },
+    "joined": {
+      "type": "string",
+      "format": "date",
+      "description": "Date they joined the group."
+    },
+    "left": {
+      "type": "string",
+      "format": "date",
+      "description": "Date they left the group. Only set when status is 'former'."
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "website": { "type": "string", "format": "uri" },
+        "github": { "type": "string", "format": "uri" },
+        "inspire": { "type": "string", "description": "INSPIRE-HEP author profile id/BAI" }
+      }
+    }
+  }
+}

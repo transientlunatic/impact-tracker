@@ -15,6 +15,16 @@ eleventyComputed:
 <p class="lede">{{ output.description }}</p>
 <p class="meta">{{ output.authors | join(", ") }} &middot; created {{ output.created | dateFormat }}</p>
 
+{% if output.group_authors %}
+<p class="meta">
+  Group authors:
+  {% for personId in output.group_authors %}
+    {% set person = people | selectattr("id", "equalto", personId) | first %}
+    <a href="{{ ('/people/' + personId + '/') | url }}">{{ person.name if person else personId }}</a>{{ ", " if not loop.last }}
+  {% endfor %}
+</p>
+{% endif %}
+
 <p>
   {% if output.links.repo %}<a href="{{ output.links.repo }}">Repository</a>{% endif %}
   {% if output.links.doi %} &middot; <a href="https://doi.org/{{ output.links.doi }}">DOI: {{ output.links.doi }}</a>{% endif %}
